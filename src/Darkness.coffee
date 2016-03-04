@@ -2,11 +2,15 @@
 { NativeValue, Touchable, View } = require "component"
 { Void } = require "type-utils"
 
+emptyFunction = require "emptyFunction"
+
 module.exports = Factory "Darkness",
 
   optionTypes:
     opacity: Number
     range: Array
+    easing: [ Function, Void ]
+    within: [ Array, Void ]
     onPress: [ Function, Void ]
 
   optionDefaults:
@@ -24,25 +28,28 @@ module.exports = Factory "Darkness",
       get: ->
         @_opacity.value
       set: (value) ->
-        assertType value, Number
         @_opacity.value = value
 
     progress:
       get: ->
         @_opacity.getProgress { from: @minOpacity, to: @maxOpacity }
       set: (progress) ->
-        assertType progress, Number
         @_opacity.setProgress { progress, from: @minOpacity, to: @maxOpacity }
 
-    onPress:
-      value: null
-      reactive: yes
-      didSet: ->
+    easing:
+      get: -> @_opacity._easing
+      set: (easing) ->
+        @_opacity._easing = easing
+
+    within:
+      get: -> @_opacity._inputRange
+      set: (inputRange) ->
+        @_opacity._inputRange = inputRange
 
     _component: lazy: ->
       require "./DarknessView"
 
-  initValues: (options) ->
+  initReactiveValues: (options) ->
 
     onPress: options.onPress
 
@@ -52,8 +59,14 @@ module.exports = Factory "Darkness",
 
     _opacity: NativeValue options.opacity
 
-  init: ->
+  init: (options) ->
+    @_opacity.type = Number
     @_opacity.value ?= @minOpacity
+    @easing = options.easing
+    @within = options.within
+
+  animate: (options) ->
+    @_opacity.animate options
 
   render: ->
     return @_component

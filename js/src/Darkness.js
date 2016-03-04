@@ -1,13 +1,17 @@
-var NativeValue, Touchable, View, Void, ref;
+var NativeValue, Touchable, View, Void, emptyFunction, ref;
 
 ref = require("component"), NativeValue = ref.NativeValue, Touchable = ref.Touchable, View = ref.View;
 
 Void = require("type-utils").Void;
 
+emptyFunction = require("emptyFunction");
+
 module.exports = Factory("Darkness", {
   optionTypes: {
     opacity: Number,
     range: Array,
+    easing: [Function, Void],
+    within: [Array, Void],
     onPress: [Function, Void]
   },
   optionDefaults: {
@@ -29,7 +33,6 @@ module.exports = Factory("Darkness", {
         return this._opacity.value;
       },
       set: function(value) {
-        assertType(value, Number);
         return this._opacity.value = value;
       }
     },
@@ -41,7 +44,6 @@ module.exports = Factory("Darkness", {
         });
       },
       set: function(progress) {
-        assertType(progress, Number);
         return this._opacity.setProgress({
           progress: progress,
           from: this.minOpacity,
@@ -49,10 +51,21 @@ module.exports = Factory("Darkness", {
         });
       }
     },
-    onPress: {
-      value: null,
-      reactive: true,
-      didSet: function() {}
+    easing: {
+      get: function() {
+        return this._opacity._easing;
+      },
+      set: function(easing) {
+        return this._opacity._easing = easing;
+      }
+    },
+    within: {
+      get: function() {
+        return this._opacity._inputRange;
+      },
+      set: function(inputRange) {
+        return this._opacity._inputRange = inputRange;
+      }
     },
     _component: {
       lazy: function() {
@@ -60,7 +73,7 @@ module.exports = Factory("Darkness", {
       }
     }
   },
-  initValues: function(options) {
+  initReactiveValues: function(options) {
     return {
       onPress: options.onPress
     };
@@ -71,9 +84,17 @@ module.exports = Factory("Darkness", {
       _opacity: NativeValue(options.opacity)
     };
   },
-  init: function() {
+  init: function(options) {
     var base;
-    return (base = this._opacity).value != null ? base.value : base.value = this.minOpacity;
+    this._opacity.type = Number;
+    if ((base = this._opacity).value == null) {
+      base.value = this.minOpacity;
+    }
+    this.easing = options.easing;
+    return this.within = options.within;
+  },
+  animate: function(options) {
+    return this._opacity.animate(options);
   },
   render: function() {
     return this._component({
