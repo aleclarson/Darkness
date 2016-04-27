@@ -1,104 +1,85 @@
-var NativeValue, Touchable, View, Void, emptyFunction, ref;
+var Component, Darkness, NativeValue, Tappable, View, ref;
 
-ref = require("component"), NativeValue = ref.NativeValue, Touchable = ref.Touchable, View = ref.View;
+ref = require("component"), NativeValue = ref.NativeValue, View = ref.View, Component = ref.Component;
 
-Void = require("type-utils").Void;
+Tappable = require("tappable");
 
-emptyFunction = require("emptyFunction");
-
-module.exports = Factory("Darkness", {
+module.exports = Darkness = Factory("Darkness", {
+  kind: NativeValue,
   optionTypes: {
-    opacity: Number,
-    range: Array,
-    easing: [Function, Void],
-    within: [Array, Void],
-    onPress: [Function, Void]
+    value: Number.Maybe,
+    minValue: Number,
+    maxValue: Number,
+    ignoreTouches: Boolean
   },
   optionDefaults: {
-    opacity: 0
+    minValue: 0,
+    maxValue: 1,
+    ignoreTouches: false
   },
-  customValues: {
-    minOpacity: {
-      get: function() {
-        return this.range[0];
-      }
-    },
-    maxOpacity: {
-      get: function() {
-        return this.range[1];
-      }
-    },
-    opacity: {
-      get: function() {
-        return this._opacity.value;
-      },
-      set: function(value) {
-        return this._opacity.value = value;
-      }
-    },
-    progress: {
-      get: function() {
-        return this._opacity.getProgress({
-          from: this.minOpacity,
-          to: this.maxOpacity
-        });
-      },
-      set: function(progress) {
-        return this._opacity.setProgress({
-          progress: progress,
-          from: this.minOpacity,
-          to: this.maxOpacity
-        });
-      }
-    },
-    easing: {
-      get: function() {
-        return this._opacity._easing;
-      },
-      set: function(easing) {
-        return this._opacity._easing = easing;
-      }
-    },
-    within: {
-      get: function() {
-        return this._opacity._inputRange;
-      },
-      set: function(inputRange) {
-        return this._opacity._inputRange = inputRange;
-      }
-    },
-    _component: {
-      lazy: function() {
-        return require("./DarknessView");
-      }
-    }
+  create: function(options) {
+    return NativeValue(options.value != null ? options.value : options.value = options.minValue);
+  },
+  initFrozenValues: function() {
+    return {
+      tap: Tappable({
+        maxTapCount: 1
+      })
+    };
   },
   initReactiveValues: function(options) {
     return {
-      onPress: options.onPress
-    };
-  },
-  initFrozenValues: function(options) {
-    return {
-      range: options.range,
-      _opacity: NativeValue(options.opacity)
+      ignoreTouches: options.ignoreTouches
     };
   },
   init: function(options) {
-    var base;
-    this._opacity.type = Number;
-    if ((base = this._opacity).value == null) {
-      base.value = this.minOpacity;
-    }
-    this.easing = options.easing;
-    return this.within = options.within;
-  },
-  animate: function(options) {
-    return this._opacity.animate(options);
+    return this.willProgress({
+      fromValue: options.minValue,
+      toValue: options.maxValue
+    });
   },
   render: function() {
-    return this._component({
+    return Darkness.View({
       darkness: this
+    });
+  },
+  _createPointerEvents: function() {
+    return NativeValue((function(_this) {
+      return function() {
+        if (_this.ignoreTouches) {
+          return "none";
+        }
+        if (_this.value === 0) {
+          return "none";
+        }
+        return "auto";
+      };
+    })(this));
+  }
+});
+
+Darkness.View = Component("DarknessView", {
+  initNativeValues: function() {
+    return {
+      pointerEvents: this.props.darkness._createPointerEvents()
+    };
+  },
+  shouldComponentUpdate: function() {
+    return false;
+  },
+  render: function() {
+    return View({
+      pointerEvents: this.pointerEvents,
+      style: {
+        opacity: this.props.darkness,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "#000",
+        position: "absolute"
+      },
+      mixins: [this.props.darkness.tap.touchHandlers]
     });
   }
 });

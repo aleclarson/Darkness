@@ -1,73 +1,74 @@
 
-{ NativeValue, Touchable, View } = require "component"
-{ Void } = require "type-utils"
+{ NativeValue, View, Component } = require "component"
 
-emptyFunction = require "emptyFunction"
+Tappable = require "tappable"
 
-module.exports = Factory "Darkness",
+module.exports =
+Darkness = Factory "Darkness",
+
+  kind: NativeValue
 
   optionTypes:
-    opacity: Number
-    range: Array
-    easing: [ Function, Void ]
-    within: [ Array, Void ]
-    onPress: [ Function, Void ]
+    value: Number.Maybe
+    minValue: Number
+    maxValue: Number
+    ignoreTouches: Boolean
 
   optionDefaults:
-    opacity: 0
+    minValue: 0
+    maxValue: 1
+    ignoreTouches: no
 
-  customValues:
+  create: (options) ->
+    NativeValue options.value ?= options.minValue
 
-    minOpacity: get: ->
-      @range[0]
+  initFrozenValues: ->
 
-    maxOpacity: get: ->
-      @range[1]
-
-    opacity:
-      get: ->
-        @_opacity.value
-      set: (value) ->
-        @_opacity.value = value
-
-    progress:
-      get: ->
-        @_opacity.getProgress { from: @minOpacity, to: @maxOpacity }
-      set: (progress) ->
-        @_opacity.setProgress { progress, from: @minOpacity, to: @maxOpacity }
-
-    easing:
-      get: -> @_opacity._easing
-      set: (easing) ->
-        @_opacity._easing = easing
-
-    within:
-      get: -> @_opacity._inputRange
-      set: (inputRange) ->
-        @_opacity._inputRange = inputRange
-
-    _component: lazy: ->
-      require "./DarknessView"
+    tap: Tappable
+      maxTapCount: 1
 
   initReactiveValues: (options) ->
 
-    onPress: options.onPress
-
-  initFrozenValues: (options) ->
-
-    range: options.range
-
-    _opacity: NativeValue options.opacity
+    ignoreTouches: options.ignoreTouches
 
   init: (options) ->
-    @_opacity.type = Number
-    @_opacity.value ?= @minOpacity
-    @easing = options.easing
-    @within = options.within
 
-  animate: (options) ->
-    @_opacity.animate options
+    @willProgress
+      fromValue: options.minValue
+      toValue: options.maxValue
 
   render: ->
-    return @_component
+    return Darkness.View
       darkness: this
+
+  _createPointerEvents: ->
+    return NativeValue =>
+      return "none" if @ignoreTouches
+      return "none" if @value is 0
+      return "auto"
+
+Darkness.View = Component "DarknessView",
+
+  initNativeValues: ->
+
+    pointerEvents: @props.darkness._createPointerEvents()
+
+  shouldComponentUpdate: ->
+    return no
+
+  render: ->
+    return View {
+      @pointerEvents
+      style: {
+        opacity: @props.darkness
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
+        backgroundColor: "#000"
+        position: "absolute"
+      }
+      mixins: [
+        @props.darkness.tap.touchHandlers
+      ]
+    }
