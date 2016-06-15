@@ -1,87 +1,128 @@
-var Component, Darkness, NativeValue, Tappable, View, ref;
+var Component, Tappable, View, ref, type;
 
-ref = require("component"), NativeValue = ref.NativeValue, View = ref.View, Component = ref.Component;
+ref = require("component"), Component = ref.Component, View = ref.View;
 
 Tappable = require("tappable");
 
-module.exports = Darkness = Factory("Darkness", {
-  kind: NativeValue,
-  optionTypes: {
-    value: Number.Maybe,
-    minValue: Number,
-    maxValue: Number,
-    ignoreTouches: Boolean
+type = Component.Type("Darkness");
+
+type.defineOptions({
+  value: {
+    type: Number,
+    required: false
   },
-  optionDefaults: {
-    minValue: 0,
-    maxValue: 1,
-    ignoreTouches: false
+  minValue: {
+    type: Number,
+    "default": 0
   },
-  create: function(options) {
-    return NativeValue(options.value != null ? options.value : options.value = options.minValue);
+  maxValue: {
+    type: Number,
+    "default": 1
   },
-  initFrozenValues: function() {
-    return {
-      tap: Tappable({
-        maxTapCount: 1
-      })
-    };
+  ignoreTouches: {
+    type: Boolean,
+    "default": false
   },
-  initReactiveValues: function(options) {
-    return {
-      ignoreTouches: options.ignoreTouches
-    };
-  },
-  init: function(options) {
-    return this.willProgress({
-      fromValue: options.minValue,
-      toValue: options.maxValue
+  easing: {
+    type: Function,
+    required: false
+  }
+});
+
+type.defineFrozenValues({
+  minValue: getArgProp("minValue"),
+  maxValue: getArgProp("maxValue"),
+  _tap: function() {
+    return Tappable({
+      maxTapCount: 1
     });
+  }
+});
+
+type.defineReactiveValues({
+  ignoreTouches: getArgProp("ignoreTouches")
+});
+
+type.defineNativeValues({
+  _opacity: function(options) {
+    if (options.value !== void 0) {
+      return options.value;
+    }
+    return options.minValue;
   },
-  render: function() {
-    return Darkness.View({
-      darkness: this
-    });
-  },
-  _createPointerEvents: function() {
-    return NativeValue((function(_this) {
+  _pointerEvents: function() {
+    return (function(_this) {
       return function() {
         if (_this.ignoreTouches) {
           return "none";
         }
-        if (_this.value === 0) {
+        if (_this._opacity.value === 0) {
           return "none";
         }
         return "auto";
       };
-    })(this));
+    })(this);
   }
 });
 
-Darkness.View = Component("DarknessView", {
-  initNativeValues: function() {
-    return {
-      pointerEvents: this.props.darkness._createPointerEvents()
-    };
+type.initInstance(function(options) {
+  return this._opacity.willProgress({
+    fromValue: options.minValue,
+    toValue: options.maxValue
+  });
+});
+
+type.definePrototype({
+  value: {
+    get: function() {
+      return this._opacity.value;
+    },
+    set: function(newValue) {
+      return this._opacity.value = newValue;
+    }
   },
-  shouldComponentUpdate: function() {
-    return false;
-  },
-  render: function() {
-    return View({
-      pointerEvents: this.pointerEvents,
-      style: {
-        opacity: this.props.darkness,
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "#000",
-        position: "absolute"
-      },
-      mixins: [this.props.darkness.tap.touchHandlers]
-    });
+  didTap: {
+    get: function() {
+      return this._tap.didTap;
+    }
   }
 });
+
+type.defineMethods({
+  animate: function(config) {
+    return this._opacity.animate(config);
+  },
+  stopAnimation: function() {
+    return this._opacity.stopAnimation();
+  }
+});
+
+type.shouldUpdate(function() {
+  return false;
+});
+
+type.render(function() {
+  return View({
+    style: this.styles.container(),
+    pointerEvents: this._pointerEvents,
+    mixins: [this._tap.touchHandlers]
+  });
+});
+
+type.defineStyles({
+  container: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#000",
+    opacity: function() {
+      return this._opacity;
+    }
+  }
+});
+
+module.exports = type.build();
 
 //# sourceMappingURL=../../map/src/Darkness.map

@@ -1,9 +1,9 @@
 {
-  "name": "darkness",
+  "name": "Darkness",
   "version": "1.0.0",
-  "main": "./js/src/Darkness",
+  "main": "js/src/Darkness",
   "dependencies": {
-    "component": "aleclarson/component#1.0.0",
+    "component": "aleclarson/component#2.0.0",
     "tappable": "aleclarson/tappable#1.0.0"
   },
   "lotus": {

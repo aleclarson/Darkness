@@ -1,74 +1,98 @@
 
-{ NativeValue, View, Component } = require "component"
+{ Component, View } = require "component"
 
 Tappable = require "tappable"
 
-module.exports =
-Darkness = Factory "Darkness",
+type = Component.Type "Darkness"
 
-  kind: NativeValue
+type.defineOptions
 
-  optionTypes:
-    value: Number.Maybe
-    minValue: Number
-    maxValue: Number
-    ignoreTouches: Boolean
+  value:
+    type: Number
+    required: no
 
-  optionDefaults:
-    minValue: 0
-    maxValue: 1
-    ignoreTouches: no
+  minValue:
+    type: Number
+    default: 0
 
-  create: (options) ->
-    NativeValue options.value ?= options.minValue
+  maxValue:
+    type: Number
+    default: 1
 
-  initFrozenValues: ->
+  ignoreTouches:
+    type: Boolean
+    default: no
 
-    tap: Tappable
+  easing:
+    type: Function
+    required: no
+
+type.defineFrozenValues
+
+  minValue: getArgProp "minValue"
+
+  maxValue: getArgProp "maxValue"
+
+  _tap: ->
+    return Tappable
       maxTapCount: 1
 
-  initReactiveValues: (options) ->
+type.defineReactiveValues
 
-    ignoreTouches: options.ignoreTouches
+  ignoreTouches: getArgProp "ignoreTouches"
 
-  init: (options) ->
+type.defineNativeValues
 
-    @willProgress
-      fromValue: options.minValue
-      toValue: options.maxValue
+  _opacity: (options) ->
+    return options.value if options.value isnt undefined
+    return options.minValue
 
-  render: ->
-    return Darkness.View
-      darkness: this
+  _pointerEvents: -> =>
+    return "none" if @ignoreTouches
+    return "none" if @_opacity.value is 0
+    return "auto"
 
-  _createPointerEvents: ->
-    return NativeValue =>
-      return "none" if @ignoreTouches
-      return "none" if @value is 0
-      return "auto"
+type.initInstance (options) ->
+  @_opacity.willProgress
+    fromValue: options.minValue
+    toValue: options.maxValue
 
-Darkness.View = Component "DarknessView",
+type.definePrototype
 
-  initNativeValues: ->
+  value:
+    get: -> @_opacity.value
+    set: (newValue) ->
+      @_opacity.value = newValue
 
-    pointerEvents: @props.darkness._createPointerEvents()
+  didTap: get: ->
+    @_tap.didTap
 
-  shouldComponentUpdate: ->
-    return no
+type.defineMethods
 
-  render: ->
-    return View {
-      @pointerEvents
-      style: {
-        opacity: @props.darkness
-        top: 0
-        left: 0
-        right: 0
-        bottom: 0
-        backgroundColor: "#000"
-        position: "absolute"
-      }
-      mixins: [
-        @props.darkness.tap.touchHandlers
-      ]
-    }
+  animate: (config) ->
+    @_opacity.animate config
+
+  stopAnimation: ->
+    @_opacity.stopAnimation()
+
+type.shouldUpdate ->
+  return no
+
+type.render ->
+  return View
+    style: @styles.container()
+    pointerEvents: @_pointerEvents
+    mixins: [ @_tap.touchHandlers ]
+
+type.defineStyles
+
+  container:
+    position: "absolute"
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    backgroundColor: "#000"
+    opacity: -> @_opacity
+
+module.exports = type.build()
