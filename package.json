@@ -1,0 +1,15 @@
+{
+  "name": "Darkness",
+  "version": "1.0.0",
+  "main": "js/Darkness",
+  "dependencies": {
+    "component": "aleclarson/component#2.0.0",
+    "fromArgs": "aleclarson/fromArgs#1.0.0",
+    "tappable": "aleclarson/tappable#1.0.0"
+  },
+  "lotus": {
+    "plugins": [
+      "lotus-coffee"
+    ]
+  }
+}
