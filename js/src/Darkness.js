@@ -1,6 +1,8 @@
-var Component, Tappable, View, ref, type;
+var Component, Tappable, View, fromArgs, ref, type;
 
 ref = require("component"), Component = ref.Component, View = ref.View;
+
+fromArgs = require("fromArgs");
 
 Tappable = require("tappable");
 
@@ -30,8 +32,8 @@ type.defineOptions({
 });
 
 type.defineFrozenValues({
-  minValue: getArgProp("minValue"),
-  maxValue: getArgProp("maxValue"),
+  minValue: fromArgs("minValue"),
+  maxValue: fromArgs("maxValue"),
   _tap: function() {
     return Tappable({
       maxTapCount: 1
@@ -40,7 +42,7 @@ type.defineFrozenValues({
 });
 
 type.defineReactiveValues({
-  ignoreTouches: getArgProp("ignoreTouches")
+  ignoreTouches: fromArgs("ignoreTouches")
 });
 
 type.defineNativeValues({
@@ -125,4 +127,4 @@ type.defineStyles({
 
 module.exports = type.build();
 
-//# sourceMappingURL=../../map/src/Darkness.map
+//# sourceMappingURL=map/Darkness.map

@@ -1,6 +1,7 @@
 
 { Component, View } = require "component"
 
+fromArgs = require "fromArgs"
 Tappable = require "tappable"
 
 type = Component.Type "Darkness"
@@ -29,9 +30,9 @@ type.defineOptions
 
 type.defineFrozenValues
 
-  minValue: getArgProp "minValue"
+  minValue: fromArgs "minValue"
 
-  maxValue: getArgProp "maxValue"
+  maxValue: fromArgs "maxValue"
 
   _tap: ->
     return Tappable
@@ -39,7 +40,7 @@ type.defineFrozenValues
 
 type.defineReactiveValues
 
-  ignoreTouches: getArgProp "ignoreTouches"
+  ignoreTouches: fromArgs "ignoreTouches"
 
 type.defineNativeValues
 
