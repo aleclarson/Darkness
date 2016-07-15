@@ -1,7 +1,7 @@
 {
   "name": "Darkness",
   "version": "1.0.0",
-  "main": "js/src/Darkness",
+  "main": "js/Darkness",
   "dependencies": {
     "component": "aleclarson/component#2.0.0",
     "fromArgs": "aleclarson/fromArgs#1.0.0",
