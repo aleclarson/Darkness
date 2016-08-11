@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "js/Darkness",
   "dependencies": {
-    "component": "aleclarson/component#2.0.0",
+    "Property": "aleclarson/Property#1.1.1",
     "fromArgs": "aleclarson/fromArgs#1.0.0",
+    "modx": "aleclarson/modx#1.0.0",
     "tappable": "aleclarson/tappable#1.0.0"
   },
   "lotus": {

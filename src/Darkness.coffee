@@ -1,42 +1,25 @@
 
-{ Component, View } = require "component"
+{frozen} = require "Property"
+{View} = require "modx/views"
+{Type} = require "modx"
 
 fromArgs = require "fromArgs"
 Tappable = require "tappable"
 
-type = Component.Type "Darkness"
+type = Type "Darkness"
 
 type.defineOptions
-
-  value:
-    type: Number
-    required: no
-
-  minValue:
-    type: Number
-    default: 0
-
-  maxValue:
-    type: Number
-    default: 1
-
-  ignoreTouches:
-    type: Boolean
-    default: no
-
-  easing:
-    type: Function
-    required: no
+  value: Number
+  minValue: Number.withDefault 0
+  maxValue: Number.withDefault 1
+  ignoreTouches: Boolean.withDefault no
+  easing: Function
 
 type.defineFrozenValues
 
   minValue: fromArgs "minValue"
 
   maxValue: fromArgs "maxValue"
-
-  _tap: ->
-    return Tappable
-      maxTapCount: 1
 
 type.defineReactiveValues
 
@@ -53,10 +36,14 @@ type.defineNativeValues
     return "none" if @_opacity.value is 0
     return "auto"
 
-type.initInstance (options) ->
-  @_opacity.willProgress
-    fromValue: options.minValue
-    toValue: options.maxValue
+type.defineGetters
+
+  didTap: -> @_tap.didTap
+
+  _tap: ->
+    value = Tappable { maxTapCount: 1 }
+    frozen.define this, "_tap", { value }
+    return value
 
 type.definePrototype
 
@@ -65,8 +52,10 @@ type.definePrototype
     set: (newValue) ->
       @_opacity.value = newValue
 
-  didTap: get: ->
-    @_tap.didTap
+  progress:
+    get: -> @_opacity.progress
+    set: (newValue) ->
+      @_opacity.progress = newValue
 
 type.defineMethods
 
@@ -84,6 +73,11 @@ type.render ->
     style: @styles.container()
     pointerEvents: @_pointerEvents
     mixins: [ @_tap.touchHandlers ]
+
+type.willMount ->
+  @_opacity.willProgress
+    fromValue: @minValue
+    toValue: @maxValue
 
 type.defineStyles
 

@@ -1,44 +1,28 @@
-var Component, Tappable, View, fromArgs, ref, type;
+var Tappable, Type, View, fromArgs, frozen, type;
 
-ref = require("component"), Component = ref.Component, View = ref.View;
+frozen = require("Property").frozen;
+
+View = require("modx/views").View;
+
+Type = require("modx").Type;
 
 fromArgs = require("fromArgs");
 
 Tappable = require("tappable");
 
-type = Component.Type("Darkness");
+type = Type("Darkness");
 
 type.defineOptions({
-  value: {
-    type: Number,
-    required: false
-  },
-  minValue: {
-    type: Number,
-    "default": 0
-  },
-  maxValue: {
-    type: Number,
-    "default": 1
-  },
-  ignoreTouches: {
-    type: Boolean,
-    "default": false
-  },
-  easing: {
-    type: Function,
-    required: false
-  }
+  value: Number,
+  minValue: Number.withDefault(0),
+  maxValue: Number.withDefault(1),
+  ignoreTouches: Boolean.withDefault(false),
+  easing: Function
 });
 
 type.defineFrozenValues({
   minValue: fromArgs("minValue"),
-  maxValue: fromArgs("maxValue"),
-  _tap: function() {
-    return Tappable({
-      maxTapCount: 1
-    });
-  }
+  maxValue: fromArgs("maxValue")
 });
 
 type.defineReactiveValues({
@@ -67,11 +51,20 @@ type.defineNativeValues({
   }
 });
 
-type.initInstance(function(options) {
-  return this._opacity.willProgress({
-    fromValue: options.minValue,
-    toValue: options.maxValue
-  });
+type.defineGetters({
+  didTap: function() {
+    return this._tap.didTap;
+  },
+  _tap: function() {
+    var value;
+    value = Tappable({
+      maxTapCount: 1
+    });
+    frozen.define(this, "_tap", {
+      value: value
+    });
+    return value;
+  }
 });
 
 type.definePrototype({
@@ -83,9 +76,12 @@ type.definePrototype({
       return this._opacity.value = newValue;
     }
   },
-  didTap: {
+  progress: {
     get: function() {
-      return this._tap.didTap;
+      return this._opacity.progress;
+    },
+    set: function(newValue) {
+      return this._opacity.progress = newValue;
     }
   }
 });
@@ -108,6 +104,13 @@ type.render(function() {
     style: this.styles.container(),
     pointerEvents: this._pointerEvents,
     mixins: [this._tap.touchHandlers]
+  });
+});
+
+type.willMount(function() {
+  return this._opacity.willProgress({
+    fromValue: this.minValue,
+    toValue: this.maxValue
   });
 });
 
