@@ -51,6 +51,13 @@ type.defineNativeValues({
   }
 });
 
+type.initInstance(function() {
+  return this._opacity.willProgress({
+    fromValue: this.minValue,
+    toValue: this.maxValue
+  });
+});
+
 type.defineGetters({
   didTap: function() {
     return this._tap.didTap;
@@ -104,13 +111,6 @@ type.render(function() {
     style: this.styles.container(),
     pointerEvents: this._pointerEvents,
     mixins: [this._tap.touchHandlers]
-  });
-});
-
-type.willMount(function() {
-  return this._opacity.willProgress({
-    fromValue: this.minValue,
-    toValue: this.maxValue
   });
 });
 

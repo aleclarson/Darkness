@@ -36,6 +36,11 @@ type.defineNativeValues
     return "none" if @_opacity.value is 0
     return "auto"
 
+type.initInstance ->
+  @_opacity.willProgress
+    fromValue: @minValue
+    toValue: @maxValue
+
 type.defineGetters
 
   didTap: -> @_tap.didTap
@@ -65,6 +70,10 @@ type.defineMethods
   stopAnimation: ->
     @_opacity.stopAnimation()
 
+#
+# Rendering
+#
+
 type.shouldUpdate ->
   return no
 
@@ -73,11 +82,6 @@ type.render ->
     style: @styles.container()
     pointerEvents: @_pointerEvents
     mixins: [ @_tap.touchHandlers ]
-
-type.willMount ->
-  @_opacity.willProgress
-    fromValue: @minValue
-    toValue: @maxValue
 
 type.defineStyles
 
