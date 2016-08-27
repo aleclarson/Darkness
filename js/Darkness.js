@@ -1,12 +1,10 @@
-var Tappable, Type, View, fromArgs, frozen, type;
+var Tappable, Type, View, frozen, type;
 
 frozen = require("Property").frozen;
 
 View = require("modx/views").View;
 
 Type = require("modx").Type;
-
-fromArgs = require("fromArgs");
 
 Tappable = require("tappable");
 
@@ -20,34 +18,35 @@ type.defineOptions({
   easing: Function
 });
 
-type.defineFrozenValues({
-  minValue: fromArgs("minValue"),
-  maxValue: fromArgs("maxValue")
+type.defineFrozenValues(function(options) {
+  return {
+    minValue: options.minValue,
+    maxValue: options.maxValue
+  };
 });
 
-type.defineReactiveValues({
-  ignoreTouches: fromArgs("ignoreTouches")
+type.defineReactiveValues(function(options) {
+  return {
+    ignoreTouches: options.ignoreTouches
+  };
+});
+
+type.defineNativeValues(function(options) {
+  var ref;
+  return {
+    _opacity: (ref = options.value) != null ? ref : options.minValue
+  };
 });
 
 type.defineNativeValues({
-  _opacity: function(options) {
-    if (options.value !== void 0) {
-      return options.value;
-    }
-    return options.minValue;
-  },
   _pointerEvents: function() {
-    return (function(_this) {
-      return function() {
-        if (_this.ignoreTouches) {
-          return "none";
-        }
-        if (_this._opacity.value === 0) {
-          return "none";
-        }
-        return "auto";
-      };
-    })(this);
+    if (this.ignoreTouches) {
+      return "none";
+    }
+    if (this._opacity.value === 0) {
+      return "none";
+    }
+    return "auto";
   }
 });
 

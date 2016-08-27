@@ -4,7 +4,6 @@
   "main": "js/Darkness",
   "dependencies": {
     "Property": "aleclarson/Property#1.1.1",
-    "fromArgs": "aleclarson/fromArgs#1.0.0",
     "modx": "aleclarson/modx#1.0.0",
     "tappable": "aleclarson/tappable#1.0.0"
   },

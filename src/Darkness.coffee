@@ -3,7 +3,6 @@
 {View} = require "modx/views"
 {Type} = require "modx"
 
-fromArgs = require "fromArgs"
 Tappable = require "tappable"
 
 type = Type "Darkness"
@@ -15,23 +14,23 @@ type.defineOptions
   ignoreTouches: Boolean.withDefault no
   easing: Function
 
-type.defineFrozenValues
+type.defineFrozenValues (options) ->
 
-  minValue: fromArgs "minValue"
+  minValue: options.minValue
 
-  maxValue: fromArgs "maxValue"
+  maxValue: options.maxValue
 
-type.defineReactiveValues
+type.defineReactiveValues (options) ->
 
-  ignoreTouches: fromArgs "ignoreTouches"
+  ignoreTouches: options.ignoreTouches
+
+type.defineNativeValues (options) ->
+
+  _opacity: options.value ? options.minValue
 
 type.defineNativeValues
 
-  _opacity: (options) ->
-    return options.value if options.value isnt undefined
-    return options.minValue
-
-  _pointerEvents: -> =>
+  _pointerEvents: ->
     return "none" if @ignoreTouches
     return "none" if @_opacity.value is 0
     return "auto"
