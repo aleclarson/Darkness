@@ -2,14 +2,20 @@
   "name": "Darkness",
   "version": "1.0.0",
   "main": "js/Darkness",
+  "plugins": [
+    "lotus-coffee"
+  ],
+  "scripts": {
+    "build": "coffee -cb -o js src",
+    "postinstall": "postinstall-build js 'npm run build'"
+  },
   "dependencies": {
     "Property": "aleclarson/Property#1.1.1",
     "modx": "aleclarson/modx#1.0.0",
+    "postinstall-build": "0.2.x",
     "tappable": "aleclarson/tappable#1.0.0"
   },
-  "lotus": {
-    "plugins": [
-      "lotus-coffee"
-    ]
+  "devDependencies": {
+    "coffee-script": "1.9.x"
   }
 }
