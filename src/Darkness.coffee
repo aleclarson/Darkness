@@ -42,11 +42,11 @@ type.initInstance ->
 
 type.defineGetters
 
-  didTap: -> @_tap.didTap
+  didTap: -> @_tap.didTap.listenable
 
   _tap: ->
-    value = Tappable { maxTapCount: 1 }
-    frozen.define this, "_tap", { value }
+    value = Tappable {maxTapCount: 1}
+    frozen.define this, "_tap", {value}
     return value
 
 type.definePrototype
