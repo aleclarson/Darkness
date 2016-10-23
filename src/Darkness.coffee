@@ -4,6 +4,8 @@
 {Type} = require "modx"
 
 Tappable = require "tappable"
+isType = require "isType"
+steal = require "steal"
 
 type = Type "Darkness"
 
@@ -45,7 +47,7 @@ type.defineGetters
   didTap: -> @_tap.didTap.listenable
 
   _tap: ->
-    value = Tappable {maxTapCount: 1}
+    value = Tappable()
     frozen.define this, "_tap", {value}
     return value
 
@@ -64,6 +66,9 @@ type.definePrototype
 type.defineMethods
 
   animate: (config) ->
+    progress = steal config, "progress"
+    if isType progress, Number
+      config.endValue = @minValue + progress * (@maxValue - @minValue)
     @_opacity.animate config
 
   stopAnimation: ->
