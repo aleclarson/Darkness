@@ -14,7 +14,6 @@ type.defineOptions
   minValue: Number.withDefault 0
   maxValue: Number.withDefault 1
   ignoreTouches: Boolean.withDefault no
-  easing: Function
 
 type.defineFrozenValues (options) ->
 
@@ -37,11 +36,6 @@ type.defineNativeValues
     return "none" if @_opacity.value is 0
     return "auto"
 
-type.initInstance ->
-  @_opacity.willProgress
-    fromValue: @minValue
-    toValue: @maxValue
-
 type.defineGetters
 
   didTap: -> @_tap.didTap.listenable
@@ -55,20 +49,22 @@ type.definePrototype
 
   value:
     get: -> @_opacity.value
-    set: (newValue) ->
-      @_opacity.value = newValue
+    set: (value) ->
+      @_opacity.value = value
 
   progress:
-    get: -> @_opacity.progress
-    set: (newValue) ->
-      @_opacity.progress = newValue
+    get: -> (@_opacity.value - @minValue) / (@maxValue - @minValue)
+    set: (progress) ->
+      @_opacity.value = @minValue + progress * (@maxValue - @minValue)
 
 type.defineMethods
 
   animate: (config) ->
+
     progress = steal config, "progress"
     if isType progress, Number
       config.endValue = @minValue + progress * (@maxValue - @minValue)
+
     @_opacity.animate config
 
   stopAnimation: ->
@@ -78,23 +74,18 @@ type.defineMethods
 # Rendering
 #
 
-type.shouldUpdate ->
-  return no
-
 type.render ->
   return View
     style: @styles.container()
     pointerEvents: @_pointerEvents
-    mixins: [ @_tap.touchHandlers ]
+    mixins: [
+      @_tap.touchHandlers
+    ]
 
 type.defineStyles
 
   container:
-    position: "absolute"
-    top: 0
-    left: 0
-    right: 0
-    bottom: 0
+    cover: yes
     backgroundColor: "#000"
     opacity: -> @_opacity
 
