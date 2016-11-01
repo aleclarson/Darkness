@@ -27,13 +27,13 @@ type.defineReactiveValues (options) ->
 
 type.defineNativeValues (options) ->
 
-  _opacity: options.value ? options.minValue
+  opacity: options.value ? options.minValue
 
 type.defineNativeValues
 
   _pointerEvents: ->
     return "none" if @ignoreTouches
-    return "none" if @_opacity.value is 0
+    return "none" if @opacity.value is 0
     return "auto"
 
 type.defineGetters
@@ -48,14 +48,14 @@ type.defineGetters
 type.definePrototype
 
   value:
-    get: -> @_opacity.value
+    get: -> @opacity.value
     set: (value) ->
-      @_opacity.value = value
+      @opacity.value = value
 
   progress:
-    get: -> (@_opacity.value - @minValue) / (@maxValue - @minValue)
+    get: -> (@opacity.value - @minValue) / (@maxValue - @minValue)
     set: (progress) ->
-      @_opacity.value = @minValue + progress * (@maxValue - @minValue)
+      @opacity.value = @minValue + progress * (@maxValue - @minValue)
 
 type.defineMethods
 
@@ -65,10 +65,10 @@ type.defineMethods
     if isType progress, Number
       config.endValue = @minValue + progress * (@maxValue - @minValue)
 
-    @_opacity.animate config
+    @opacity.animate config
 
   stopAnimation: ->
-    @_opacity.stopAnimation()
+    @opacity.stopAnimation()
 
 #
 # Rendering
@@ -87,6 +87,6 @@ type.defineStyles
   container:
     cover: yes
     backgroundColor: "#000"
-    opacity: -> @_opacity
+    opacity: -> @opacity
 
 module.exports = type.build()
