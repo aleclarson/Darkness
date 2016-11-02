@@ -10,7 +10,6 @@
     "postinstall": "npm run build"
   },
   "dependencies": {
-    "Property": "aleclarson/Property#1.2.0",
     "isType": "aleclarson/isType#1.0.0",
     "modx": "aleclarson/modx#1.0.0",
     "steal": "aleclarson/steal#1.2.0",

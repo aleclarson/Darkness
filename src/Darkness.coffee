@@ -1,5 +1,4 @@
 
-{frozen} = require "Property"
 {View} = require "modx/views"
 {Type} = require "modx"
 
@@ -10,12 +9,20 @@ steal = require "steal"
 type = Type "Darkness"
 
 type.defineOptions
+  color: String.withDefault "#000"
   value: Number
   minValue: Number.withDefault 0
   maxValue: Number.withDefault 1
   ignoreTouches: Boolean.withDefault no
+  tap: Tappable
+
+type.defineValues (options) ->
+
+  _tap: options.tap
 
 type.defineFrozenValues (options) ->
+
+  color: options.color
 
   minValue: options.minValue
 
@@ -36,14 +43,15 @@ type.defineNativeValues
     return "none" if @opacity.value is 0
     return "auto"
 
-type.defineGetters
+type.defineListeners ->
 
-  didTap: -> @_tap.didTap.listenable
+  if fn = @props.onTap
+    tap = @_tap ?= Tappable()
+    tap.didTap fn
 
-  _tap: ->
-    value = Tappable()
-    frozen.define this, "_tap", {value}
-    return value
+#
+# Prototype
+#
 
 type.definePrototype
 
@@ -56,6 +64,12 @@ type.definePrototype
     get: -> (@opacity.value - @minValue) / (@maxValue - @minValue)
     set: (progress) ->
       @opacity.value = @minValue + progress * (@maxValue - @minValue)
+
+type.defineGetters
+
+  didResponderGrant: -> @_tap.didGrant.listenable
+
+  didResponderEnd: -> @_tap.didEnd.listenable
 
 type.defineMethods
 
@@ -74,19 +88,20 @@ type.defineMethods
 # Rendering
 #
 
+type.defineProps
+  onTap: Function
+
 type.render ->
   return View
     style: @styles.container()
     pointerEvents: @_pointerEvents
-    mixins: [
-      @_tap.touchHandlers
-    ]
+    mixins: [@_tap.touchHandlers]
 
 type.defineStyles
 
   container:
     cover: yes
-    backgroundColor: "#000"
+    backgroundColor: -> @color
     opacity: -> @opacity
 
 module.exports = type.build()
