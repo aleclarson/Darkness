@@ -95,7 +95,7 @@ type.render ->
   return View
     style: @styles.container()
     pointerEvents: @_pointerEvents
-    mixins: [@_tap.touchHandlers]
+    mixins: [@_tap?.touchHandlers]
 
 type.defineStyles
 
