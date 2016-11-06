@@ -32,19 +32,18 @@ type.defineReactiveValues (options) ->
 
   ignoreTouches: options.ignoreTouches
 
-type.defineNativeValues (options) ->
+type.defineAnimatedValues (options) ->
 
   opacity: options.value ? options.minValue
 
-type.defineNativeValues
+type.defineReactions
 
-  _pointerEvents: ->
+  _containerEvents: ->
     return "none" if @ignoreTouches
-    return "none" if @opacity.value is 0
+    return "none" if @opacity.get() is 0
     return "auto"
 
 type.defineListeners ->
-
   if fn = @props.onTap
     tap = @_tap ?= Tappable()
     tap.didTap fn
@@ -56,14 +55,14 @@ type.defineListeners ->
 type.definePrototype
 
   value:
-    get: -> @opacity.value
+    get: -> @opacity.get()
     set: (value) ->
-      @opacity.value = value
+      @opacity.set value
 
   progress:
-    get: -> (@opacity.value - @minValue) / (@maxValue - @minValue)
+    get: -> (@opacity.get() - @minValue) / (@maxValue - @minValue)
     set: (progress) ->
-      @opacity.value = @minValue + progress * (@maxValue - @minValue)
+      @opacity.set @minValue + progress * (@maxValue - @minValue)
 
 type.defineGetters
 
@@ -94,7 +93,7 @@ type.defineProps
 type.render ->
   return View
     style: @styles.container()
-    pointerEvents: @_pointerEvents
+    pointerEvents: @_containerEvents
     mixins: [@_tap?.touchHandlers]
 
 type.defineStyles
