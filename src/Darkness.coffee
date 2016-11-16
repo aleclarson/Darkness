@@ -1,4 +1,5 @@
 
+{AnimatedValue} = require "Animated"
 {View} = require "modx/views"
 {Type} = require "modx"
 
@@ -14,6 +15,7 @@ type.defineOptions
   minValue: Number.withDefault 0
   maxValue: Number.withDefault 1
   ignoreTouches: Boolean.withDefault no
+  isNative: Boolean.withDefault no
   tap: Tappable
 
 type.defineValues (options) ->
@@ -34,7 +36,8 @@ type.defineReactiveValues (options) ->
 
 type.defineAnimatedValues (options) ->
 
-  opacity: options.value ? options.minValue
+  opacity: AnimatedValue options.value ? options.minValue,
+    isNative: options.isNative
 
 type.defineReactions
 
