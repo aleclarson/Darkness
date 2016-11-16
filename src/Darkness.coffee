@@ -69,6 +69,8 @@ type.definePrototype
 
 type.defineGetters
 
+  animation: -> @opacity.animation
+
   didResponderGrant: -> @_tap.didGrant.listenable
 
   didResponderEnd: -> @_tap.didEnd.listenable
