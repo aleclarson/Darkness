@@ -81,7 +81,7 @@ type.defineMethods
 
     progress = steal config, "progress"
     if isType progress, Number
-      config.endValue = @minValue + progress * (@maxValue - @minValue)
+      config.toValue = @minValue + progress * (@maxValue - @minValue)
 
     @opacity.animate config
 
