@@ -3,7 +3,7 @@
 {View} = require "modx/views"
 {Type} = require "modx"
 
-Tappable = require "tappable"
+TapResponder = require "TapResponder"
 isType = require "isType"
 steal = require "steal"
 
@@ -16,7 +16,7 @@ type.defineOptions
   maxValue: Number.withDefault 1
   ignoreTouches: Boolean.withDefault no
   isNative: Boolean.withDefault no
-  tap: Tappable
+  tap: TapResponder
 
 type.defineValues (options) ->
 
@@ -48,7 +48,7 @@ type.defineReactions
 
 type.defineListeners ->
   if fn = @props.onTap
-    tap = @_tap ?= Tappable()
+    tap = @_tap ?= TapResponder()
     tap.didTap fn
 
 #
