@@ -1,13 +1,13 @@
 
 {AnimatedValue} = require "Animated"
-{View} = require "modx/views"
-{Type} = require "modx"
 
 TapResponder = require "TapResponder"
+ReactType = require "modx/lib/Type"
 isType = require "isType"
 steal = require "steal"
+View = require "modx/lib/View"
 
-type = Type "Darkness"
+type = ReactType "Darkness"
 
 type.defineOptions
   color: String.withDefault "#000"
