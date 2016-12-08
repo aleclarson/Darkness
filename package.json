@@ -1,15 +1,19 @@
 {
   "name": "Darkness",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "js/Darkness",
-  "dependencies": {
-    "component": "aleclarson/component#2.0.0",
-    "fromArgs": "aleclarson/fromArgs#1.0.0",
-    "tappable": "aleclarson/tappable#1.0.0"
+  "plugins": [
+    "lotus-coffee"
+  ],
+  "scripts": {
+    "build": "coffee-build -v 1.11.x -b -o js src",
+    "postinstall": "npm run build"
   },
-  "lotus": {
-    "plugins": [
-      "lotus-coffee"
-    ]
+  "dependencies": {
+    "Animated": "aleclarson/Animated#3.0.0",
+    "TapResponder": "aleclarson/TapResponder#1.2.0",
+    "isType": "aleclarson/isType#1.0.1",
+    "modx": "aleclarson/modx#2.0.1",
+    "steal": "aleclarson/steal#1.2.0"
   }
 }

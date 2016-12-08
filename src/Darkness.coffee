@@ -1,99 +1,111 @@
 
-{ Component, View } = require "component"
+{AnimatedValue} = require "Animated"
+{View} = require "modx/views"
+{Type} = require "modx"
 
-fromArgs = require "fromArgs"
-Tappable = require "tappable"
+TapResponder = require "TapResponder"
+isType = require "isType"
+steal = require "steal"
 
-type = Component.Type "Darkness"
+type = Type "Darkness"
 
 type.defineOptions
+  color: String.withDefault "#000"
+  value: Number
+  minValue: Number.withDefault 0
+  maxValue: Number.withDefault 1
+  ignoreTouches: Boolean.withDefault no
+  isNative: Boolean.withDefault no
+  tap: TapResponder
 
-  value:
-    type: Number
-    required: no
+type.defineValues (options) ->
 
-  minValue:
-    type: Number
-    default: 0
+  _tap: options.tap
 
-  maxValue:
-    type: Number
-    default: 1
+type.defineFrozenValues (options) ->
 
-  ignoreTouches:
-    type: Boolean
-    default: no
+  color: options.color
 
-  easing:
-    type: Function
-    required: no
+  minValue: options.minValue
 
-type.defineFrozenValues
+  maxValue: options.maxValue
 
-  minValue: fromArgs "minValue"
+type.defineReactiveValues (options) ->
 
-  maxValue: fromArgs "maxValue"
+  ignoreTouches: options.ignoreTouches
 
-  _tap: ->
-    return Tappable
-      maxTapCount: 1
+type.defineAnimatedValues (options) ->
 
-type.defineReactiveValues
+  opacity: AnimatedValue options.value ? options.minValue,
+    isNative: options.isNative
 
-  ignoreTouches: fromArgs "ignoreTouches"
+type.defineReactions
 
-type.defineNativeValues
-
-  _opacity: (options) ->
-    return options.value if options.value isnt undefined
-    return options.minValue
-
-  _pointerEvents: -> =>
+  _containerEvents: ->
     return "none" if @ignoreTouches
-    return "none" if @_opacity.value is 0
+    return "none" if @opacity.get() is 0
     return "auto"
 
-type.initInstance (options) ->
-  @_opacity.willProgress
-    fromValue: options.minValue
-    toValue: options.maxValue
+type.defineListeners ->
+  if fn = @props.onTap
+    tap = @_tap ?= TapResponder()
+    tap.didTap fn
+
+#
+# Prototype
+#
 
 type.definePrototype
 
   value:
-    get: -> @_opacity.value
-    set: (newValue) ->
-      @_opacity.value = newValue
+    get: -> @opacity.get()
+    set: (value) ->
+      @opacity.set value
 
-  didTap: get: ->
-    @_tap.didTap
+  progress:
+    get: -> (@opacity.get() - @minValue) / (@maxValue - @minValue)
+    set: (progress) ->
+      @opacity.set @minValue + progress * (@maxValue - @minValue)
+
+type.defineGetters
+
+  animation: -> @opacity.animation
+
+  didResponderGrant: -> @_tap.didGrant.listenable
+
+  didResponderEnd: -> @_tap.didEnd.listenable
 
 type.defineMethods
 
   animate: (config) ->
-    @_opacity.animate config
+
+    progress = steal config, "progress"
+    if isType progress, Number
+      config.toValue = @minValue + progress * (@maxValue - @minValue)
+
+    @opacity.animate config
 
   stopAnimation: ->
-    @_opacity.stopAnimation()
+    @opacity.stopAnimation()
 
-type.shouldUpdate ->
-  return no
+#
+# Rendering
+#
+
+type.defineProps
+  onTap: Function
 
 type.render ->
   return View
     style: @styles.container()
-    pointerEvents: @_pointerEvents
-    mixins: [ @_tap.touchHandlers ]
+    pointerEvents: @_containerEvents
+    mixins: [@_tap?.touchHandlers]
 
 type.defineStyles
 
   container:
-    position: "absolute"
-    top: 0
-    left: 0
-    right: 0
-    bottom: 0
-    backgroundColor: "#000"
-    opacity: -> @_opacity
+    cover: yes
+    backgroundColor: -> @color
+    opacity: -> @opacity
 
 module.exports = type.build()
