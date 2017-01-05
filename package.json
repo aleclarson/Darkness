@@ -13,7 +13,7 @@
     "Animated": "aleclarson/Animated#3.0.0",
     "TapResponder": "aleclarson/TapResponder#1.2.0",
     "isType": "aleclarson/isType#1.0.1",
-    "modx": "aleclarson/modx#2.1.0",
+    "modx": "aleclarson/modx#2.4.0",
     "steal": "aleclarson/steal#1.2.0"
   }
 }

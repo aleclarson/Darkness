@@ -34,7 +34,7 @@ type.defineReactiveValues (options) ->
 
   ignoreTouches: options.ignoreTouches
 
-type.defineAnimatedValues (options) ->
+type.defineValues (options) ->
 
   opacity: AnimatedValue options.value ? options.minValue,
     isNative: options.isNative
