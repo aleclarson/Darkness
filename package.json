@@ -1,6 +1,6 @@
 {
   "name": "Darkness",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "js/Darkness",
   "plugins": [
     "lotus-coffee"
