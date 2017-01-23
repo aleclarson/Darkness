@@ -1,0 +1,12 @@
+{
+  "name": "Darkness",
+  "version": "2.0.2",
+  "main": "js/Darkness",
+  "dependencies": {
+    "Animated": "aleclarson/Animated#3.5.0",
+    "TapResponder": "aleclarson/TapResponder#1.2.3",
+    "isType": "aleclarson/isType#1.0.1",
+    "modx": "aleclarson/modx#2.4.1",
+    "steal": "aleclarson/steal#1.2.0"
+  }
+}
