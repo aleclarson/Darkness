@@ -9,14 +9,23 @@ View = require "modx/lib/View"
 
 type = ReactType "Darkness"
 
-type.defineOptions
-  color: String.withDefault "#000"
-  value: Number
-  minValue: Number.withDefault 0
-  maxValue: Number.withDefault 1
-  ignoreTouches: Boolean.withDefault no
-  isNative: Boolean.withDefault no
-  tap: TapResponder
+type.defineArgs ->
+
+  types:
+    color: String
+    value: Number
+    minValue: Number
+    maxValue: Number
+    ignoreTouches: Boolean
+    isNative: Boolean
+    tap: TapResponder
+
+  defaults:
+    color: "#000"
+    minValue: 0
+    maxValue: 1
+    ignoreTouches: no
+    isNative: no
 
 type.defineValues (options) ->
 
