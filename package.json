@@ -10,10 +10,10 @@
     "postinstall": "npm run build"
   },
   "dependencies": {
-    "Animated": "aleclarson/Animated#3.6.0",
-    "TapResponder": "aleclarson/TapResponder#1.3.0",
-    "isType": "aleclarson/isType#1.0.1",
-    "modx": "aleclarson/modx#2.5.0",
+    "Animated": "aleclarson/Animated#3.7.0",
+    "TapResponder": "aleclarson/TapResponder#1.3.1",
+    "isType": "aleclarson/isType#1.0.2",
+    "modx": "aleclarson/modx#2.6.0",
     "steal": "aleclarson/steal#1.2.0"
   }
 }

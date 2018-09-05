@@ -56,9 +56,11 @@ type.defineReactions
     return "auto"
 
 type.defineListeners ->
-  if fn = @props.onTap
-    tap = @_tap ?= TapResponder()
-    tap.didTap fn
+
+  if onTap = @props.onTap
+    tap = @_tap or @_tap = TapResponder()
+    tap.didTap onTap
+    return
 
 #
 # Prototype
